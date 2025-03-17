@@ -1,5 +1,9 @@
 # ✨ Full Stack Realtime Chat App ✨
 
+<a href="https://chatbuddy-dgfc.onrender.com" target="blank">
+        <img src="https://img.shields.io/static/v1?style=for-the-badge&message=Want to see live preview »&color=1BB91F&logo=Bluefly&logoColor=FFFFFF&label=" alt="Bluefly-Clone" />
+        </a>
+
 Highlights:
 
 - 🌟 Tech stack: MERN + Socket.io + TailwindCSS + Daisy UI
