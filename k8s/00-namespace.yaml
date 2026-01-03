@@ -4,3 +4,4 @@ metadata:
   name: chat-app
   labels:
     name: chat-app
+    app: chatbuddy

@@ -1,21 +1,51 @@
 # ✨ Full Stack Realtime Chat App ✨
 
-<a href="https://chatbuddy-dgfc.onrender.com" target="blank">
-        <img src="https://img.shields.io/static/v1?style=for-the-badge&message=Want to see live preview »&color=1BB91F&logo=Bluefly&logoColor=FFFFFF&label=" alt="Bluefly-Clone" />
-        </a>
+[![Deploy Status](https://github.com/Baladattu/ChatBuddy/actions/workflows/deploy.yaml/badge.svg)](https://github.com/Baladattu/ChatBuddy/actions/workflows/deploy.yaml)
 
-Highlights:
+## 🌐 Live Demo
 
-- 🌟 Tech stack: MERN + Socket.io + TailwindCSS + Daisy UI
-- 🎃 Authentication && Authorization with JWT
-- 👾 Real-time messaging with Socket.io
-- 🚀 Online user status
-- 👌 Global state management with Zustand
-- 🐞 Error handling both on the server and on the client
+**Production**: [https://chatbuddy.duckdns.org](https://chatbuddy.duckdns.org)
+
+## ✨ Highlights
+
+- 🌟 **Tech stack**: MERN + Socket.io + TailwindCSS + Daisy UI
+- 🎃 **Authentication & Authorization** with JWT
+- 👾 **Real-time messaging** with Socket.io
+- 🚀 **Online user status**
+- 👌 **Global state management** with Zustand
+- 🐞 **Error handling** both on the server and on the client
+- ☸️ **Production deployment** on Kubernetes
+- 🔄 **CI/CD Pipeline** with GitHub Actions
+- 🌍 **Cloudflare Tunnel** for secure external access
+
+## 🏗️ Architecture
+
+```
+Internet → Cloudflare Tunnel → Frontend (nginx) → Backend (Node.js) → MongoDB
+```
+
+## 🚀 Deployment
+
+This application is deployed on Kubernetes with automated CI/CD. See [`k8s/README.md`](k8s/README.md) for deployment instructions.
+
+### Quick Deploy
+
+1. Set up GitHub Secrets (see [k8s/README.md](k8s/README.md))
+2. Push to `main` branch
+3. GitHub Actions automatically builds and deploys
+4. Access at [chatbuddy.duckdns.org](https://chatbuddy.duckdns.org)
+
+## 🛠️ Local Development
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB instance
+- Cloudinary account (optional, for image uploads)
 
 ### Setup .env file
 
-```js
+```env
 MONGODB_URI=...
 PORT=5001
 JWT_SECRET=...
@@ -38,3 +68,19 @@ npm run build
 ```shell
 npm start
 ```
+
+### Development mode
+
+```shell
+# Frontend
+cd frontend
+npm run dev
+
+# Backend
+cd backend
+npm run dev
+```
+
+## 📝 License
+
+MIT License - see LICENSE file for details

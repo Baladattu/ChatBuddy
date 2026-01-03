@@ -1,0 +1,132 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  BACKEND_IMAGE: kbaladattu/chatbuddy-backend
+  FRONTEND_IMAGE: kbaladattu/chatbuddy-frontend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get short SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+            ${{ env.BACKEND_IMAGE }}:latest
+          cache-from: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.BACKEND_IMAGE }}:buildcache,mode=max
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+            ${{ env.FRONTEND_IMAGE }}:latest
+          cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache,mode=max
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Update secrets with MongoDB URI
+        run: |
+          kubectl create secret generic chatbuddy-secrets \
+            --from-literal=MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --from-literal=NODE_ENV="production" \
+            --from-literal=CLOUDINARY_CLOUD_NAME="${{ secrets.CLOUDINARY_CLOUD_NAME }}" \
+            --from-literal=CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" \
+            --from-literal=CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" \
+            --namespace=chat-app \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to Kubernetes
+        run: |
+          # Apply all manifests except secrets (handled separately)
+          kubectl apply -f k8s/00-namespace.yaml
+          kubectl apply -f k8s/02-backend-deployment.yaml
+          kubectl apply -f k8s/03-backend-service.yaml
+          kubectl apply -f k8s/04-frontend-deployment.yaml
+          kubectl apply -f k8s/05-frontend-service.yaml
+          kubectl apply -f k8s/06-cloudflared-tunnel.yaml
+
+      - name: Update deployment images
+        run: |
+          kubectl set image deployment/chatbuddy-backend backend=${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }} -n chat-app
+          kubectl set image deployment/chatbuddy-frontend frontend=${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }} -n chat-app
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/chatbuddy-backend -n chat-app --timeout=5m
+          kubectl rollout status deployment/chatbuddy-frontend -n chat-app --timeout=5m
+          kubectl rollout status deployment/cloudflared-tunnel -n chat-app --timeout=5m
+
+      - name: Verify deployment
+        run: |
+          echo "=== Pods Status ==="
+          kubectl get pods -n chat-app
+          
+          echo ""
+          echo "=== Services ==="
+          kubectl get svc -n chat-app
+          
+          echo ""
+          echo "=== Backend Logs (last 20 lines) ==="
+          kubectl logs -l app=chatbuddy-backend -n chat-app --tail=20 || true
+          
+          echo ""
+          echo "=== Deployment Status ==="
+          kubectl get deployments -n chat-app
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend Image**: \`${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend Image**: \`${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Access**: [https://chatbuddy.duckdns.org](https://chatbuddy.duckdns.org)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pod Status" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          kubectl get pods -n chat-app >> $GITHUB_STEP_SUMMARY || echo "Failed to get pods" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
