@@ -1,33 +1,4 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: cloudflared-credentials
-  namespace: chat-app
-type: Opaque
-stringData:
-  credentials.json: |
-    {
-      "AccountTag": "2adf0061fd106aaa4b6d6abc898fc0ed",
-      "TunnelSecret": "G0hqwCMUPI4nliw6atW2xLI6eHb/2a3mWkEwFirNX30=",
-      "TunnelID": "8c19d49e-c5f7-4d19-a8dc-c6b4de0e26a1"
-    }
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cloudflared-config
-  namespace: chat-app
-data:
-  config.yaml: |
-    tunnel: 8c19d49e-c5f7-4d19-a8dc-c6b4de0e26a1
-    credentials-file: /etc/cloudflared/credentials.json
-    
-    ingress:
-      # Route all traffic to frontend service
-      - service: http://chatbuddy-frontend:80
-        originRequest:
-          noTLSVerify: true
----
+# Quick Tunnel - No domain required, auto-generates trycloudflare.com URL
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -36,7 +7,7 @@ metadata:
   labels:
     app: cloudflared
 spec:
-  replicas: 2
+  replicas: 1  # Only 1 replica for Quick Tunnel (URL is per-instance)
   selector:
     matchLabels:
       app: cloudflared
@@ -50,18 +21,9 @@ spec:
         image: cloudflare/cloudflared:latest
         args:
         - tunnel
-        - --config
-        - /etc/cloudflared/config.yaml
-        - run
-        volumeMounts:
-        - name: config
-          mountPath: /etc/cloudflared/config.yaml
-          subPath: config.yaml
-          readOnly: true
-        - name: credentials
-          mountPath: /etc/cloudflared/credentials.json
-          subPath: credentials.json
-          readOnly: true
+        - --no-autoupdate
+        - --url
+        - http://chatbuddy-frontend:80
         resources:
           requests:
             memory: "64Mi"
@@ -69,10 +31,3 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "200m"
-      volumes:
-      - name: config
-        configMap:
-          name: cloudflared-config
-      - name: credentials
-        secret:
-          secretName: cloudflared-credentials
