@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbuddy-frontend
+  namespace: chat-app
+  labels:
+    app: chatbuddy-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatbuddy-frontend
+  template:
+    metadata:
+      labels:
+        app: chatbuddy-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: kbaladattu/chatbuddy-frontend:latest
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbuddy-frontend
+  namespace: chat-app
+spec:
+  selector:
+    app: chatbuddy-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  type: LoadBalancer

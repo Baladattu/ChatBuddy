@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbuddy-backend
+  namespace: chat-app
+  labels:
+    app: chatbuddy-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatbuddy-backend
+  template:
+    metadata:
+      labels:
+        app: chatbuddy-backend
+    spec:
+      containers:
+      - name: backend
+        image: kbaladattu/chatbuddy-backend:latest
+        ports:
+        - containerPort: 5001
+          name: http
+        env:
+        - name: PORT
+          value: "5001"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: chatbuddy-secrets
+              key: MONGODB_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: chatbuddy-secrets
+              key: JWT_SECRET
+        - name: NODE_ENV
+          valueFrom:
+            secretKeyRef:
+              name: chatbuddy-secrets
+              key: NODE_ENV
+        - name: CLOUDINARY_CLOUD_NAME
+          valueFrom:
+            secretKeyRef:
+              name: chatbuddy-secrets
+              key: CLOUDINARY_CLOUD_NAME
+              optional: true
+        - name: CLOUDINARY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: chatbuddy-secrets
+              key: CLOUDINARY_API_KEY
+              optional: true
+        - name: CLOUDINARY_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: chatbuddy-secrets
+              key: CLOUDINARY_API_SECRET
+              optional: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /api/auth/check
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbuddy-backend
+  namespace: chat-app
+spec:
+  selector:
+    app: chatbuddy-backend
+  ports:
+  - port: 5001
+    targetPort: 5001
+    protocol: TCP
+  type: ClusterIP
