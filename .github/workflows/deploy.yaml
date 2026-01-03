@@ -124,7 +124,7 @@ jobs:
           echo "**Backend Image**: \`${{ env.BACKEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Frontend Image**: \`${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Access**: [https://chatbuddy.duckdns.org](https://chatbuddy.duckdns.org)" >> $GITHUB_STEP_SUMMARY
+          echo "**Access**: [https://chatbuddy.pages.dev](https://chatbuddy.pages.dev)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Pod Status" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

@@ -4,7 +4,7 @@
 
 ## 🌐 Live Demo
 
-**Production**: [https://chatbuddy.duckdns.org](https://chatbuddy.duckdns.org)
+**Production**: [https://chatbuddy.pages.dev](https://chatbuddy.pages.dev)
 
 ## ✨ Highlights
 
