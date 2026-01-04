@@ -6,7 +6,7 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>((set) => ({
-    theme: (typeof window !== "undefined" ? localStorage.getItem("chat-theme") : null) || "coffee",
+    theme: (typeof window !== "undefined" ? localStorage.getItem("chat-theme") : null) || "dark",
     setTheme: (theme) => {
         if (typeof window !== "undefined") {
             localStorage.setItem("chat-theme", theme);
