@@ -1,26 +1,24 @@
-'use client';
-
-import { useEffect } from 'react';
 import type { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
-import { useThemeStore } from '@/store/useThemeStore';
+import ThemeProvider from '@/components/ThemeProvider';
 import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'ChatBuddy - Real-time Chat Application',
+  description: 'Connect with friends in real-time',
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { theme } = useThemeStore();
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
   return (
-    <html lang="en">
+    <html lang="en" data-theme="coffee">
       <body suppressHydrationWarning>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>
