@@ -20,8 +20,8 @@ interface ChatState {
     getMessages: (userId: string) => Promise<void>;
     sendMessage: (messageData: MessageData) => Promise<void>;
     subscribeToMessages: () => void;
-  un subscribeFromMessages: () => void;
-setSelectedUser: (selectedUser: User | null) => void;
+    unsubscribeFromMessages: () => void;
+    setSelectedUser: (selectedUser: User | null) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
