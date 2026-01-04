@@ -4,7 +4,9 @@
 
 ## 🌐 Live Demo
 
-**Production**: [https://chatbuddy.pages.dev](https://chatbuddy.pages.dev)
+**Production**: [https://uncertainty-oldest-holes-endorsed.trycloudflare.com](https://uncertainty-oldest-holes-endorsed.trycloudflare.com)
+
+> **Note**: Using Cloudflare Quick Tunnel. URL may change on pod restart. Run `./update-url.sh` to update this README with the latest URL.
 
 ## ✨ Highlights
 
@@ -33,7 +35,6 @@ This application is deployed on Kubernetes with automated CI/CD. See [`k8s/READM
 1. Set up GitHub Secrets (see [k8s/README.md](k8s/README.md))
 2. Push to `main` branch
 3. GitHub Actions automatically builds and deploys
-4. Access at [chatbuddy.duckdns.org](https://chatbuddy.duckdns.org)
 
 ## 🛠️ Local Development
 
