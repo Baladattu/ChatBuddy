@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
+import { IUser } from "../types/index.js";
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema<IUser>(
   {
     email: {
       type: String,
@@ -24,6 +25,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 
 export default User;

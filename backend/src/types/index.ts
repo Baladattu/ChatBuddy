@@ -1,4 +1,6 @@
 import { Document } from 'mongoose';
+import mongoose from 'mongoose';
+
 
 // User Types
 export interface IUser extends Document {
@@ -25,8 +27,8 @@ export interface LoginData {
 // Message Types
 export interface IMessage extends Document {
     _id: string;
-    senderId: string;
-    receiverId: string;
+    senderId: mongoose.Types.ObjectId | string;
+    receiverId: mongoose.Types.ObjectId | string;
     text?: string;
     image?: string;
     createdAt: Date;
