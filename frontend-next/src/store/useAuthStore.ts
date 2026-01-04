@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { io, Socket } from "socket.io-client";
 import type { User, SignupData, LoginData, AuthResponse, ServerToClientEvents, ClientToServerEvents } from "../types";
 
-const BASE_URL = "";
+const BASE_URL = "http://localhost:5001";
 
 interface AuthState {
     authUser: User | null;
