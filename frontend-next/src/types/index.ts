@@ -4,6 +4,8 @@ export interface User {
     fullName: string;
     email: string;
     profilePic: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 // Message Types
