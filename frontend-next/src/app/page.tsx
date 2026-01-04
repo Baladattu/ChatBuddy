@@ -15,16 +15,32 @@ export default function RootPage() {
   useEffect(() => {
     if (!isCheckingAuth) {
       if (authUser) {
-        router.push('/');
+        // User is authenticated, stay on home page
+        return;
       } else {
+        // User is not authenticated, redirect to login
         router.push('/login');
       }
     }
   }, [authUser, isCheckingAuth, router]);
 
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <span className="loading loading-spinner loading-lg"></span>
-    </div>
-  );
+  if (isCheckingAuth) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  // If authenticated, redirect to chat page
+  if (authUser) {
+    router.push('/chat');
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  return null;
 }
