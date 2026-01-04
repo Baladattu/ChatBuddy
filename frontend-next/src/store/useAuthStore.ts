@@ -53,6 +53,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ authUser: res.data });
             toast.success("Account created successfully");
             get().connectSocket();
+            // Redirect to home
+            if (typeof window !== 'undefined') {
+                window.location.href = '/';
+            }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Signup failed");
         } finally {
@@ -67,6 +71,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ authUser: res.data });
             toast.success("Logged in successfully");
             get().connectSocket();
+            // Redirect to home
+            if (typeof window !== 'undefined') {
+                window.location.href = '/';
+            }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Login failed");
         } finally {
@@ -80,6 +88,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ authUser: null });
             toast.success("Logged out successfully");
             get().disconnectSocket();
+            // Redirect to login
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+            }
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Logout failed");
         }
