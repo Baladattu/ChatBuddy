@@ -14,13 +14,11 @@ export default function RootPage() {
 
   useEffect(() => {
     if (!isCheckingAuth) {
-      if (authUser) {
-        // User is authenticated, stay on home page
-        return;
-      } else {
+      if (!authUser) {
         // User is not authenticated, redirect to login
         router.push('/login');
       }
+      // If authenticated, just stay on this page (which will show the chat)
     }
   }, [authUser, isCheckingAuth, router]);
 
@@ -32,9 +30,8 @@ export default function RootPage() {
     );
   }
 
-  // If authenticated, redirect to chat page
-  if (authUser) {
-    router.push('/chat');
+  // User is not authenticated, they'll be redirected by the useEffect
+  if (!authUser) {
     return (
       <div className="flex items-center justify-center h-screen">
         <span className="loading loading-spinner loading-lg"></span>
@@ -42,5 +39,8 @@ export default function RootPage() {
     );
   }
 
+  // User is authenticated, but the actual chat UI is in (chat)/page.tsx
+  // This root page should not be reached for authenticated users
+  // Let's redirect them properly
   return null;
 }
